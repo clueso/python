@@ -45,16 +45,31 @@ def check_location_neighbours(x, y):
 	return False;
 
 def check_within_bounds(x,y):
-	return (x > 0 and x < rows and y > 0 and y < cols);
+	return (x >= 0 and x < rows and y >= 0 and y < cols);
 
-def write_to_file(filename):
+def write_to_image(filename):
 	file_handle = open(filename,'wb');
 	png_writer = png.Writer(rows,cols,greyscale=True);
 	png_writer.write(file_handle,canvas);
 	file_handle.close();
 
-curr_x = 0;
-curr_y = 0;
+def get_start_point():
+	choose_side = random.random();
+	one_side = random.random();
+	if (choose_side < 0.5):
+		if(one_side < 0.5):
+			choose_col = 0;
+		else:
+			choose_col = cols - 1;
+		choose_row = random.randint(0,rows);
+	else:
+		if(one_side < 0.5):
+			choose_row = 0;
+		else:
+			choose_row = rows - 1;
+		choose_col = random.randint(0,cols);
+	return [choose_row, choose_col];
+
 particles_completed = 0;
 
 init();
@@ -62,14 +77,15 @@ set_canvas_location(120,80,occupied_value);
 set_canvas_location(120,160,occupied_value);
 
 while (particles_completed < total_particles):
-	curr_x = random.randint(0,rows);
-	curr_y = random.randint(0,cols);
-	while (check_within_bounds(curr_x,curr_y)):
-		if (check_location_neighbours(curr_x,curr_y)):
+	curr_loc = get_start_point();
+	#print("Trying point x=%d, y=%d\n" % (curr_loc[0],curr_loc[1]));	
+	while (check_within_bounds(curr_loc[0],curr_loc[1])):
+		if (check_location_neighbours(curr_loc[0],curr_loc[1])):
 			print ("Point %d anchored" % particles_completed);
-			set_canvas_location(curr_x,curr_y,occupied_value);
+			set_canvas_location(curr_loc[0],curr_loc[1],occupied_value);
 			particles_completed += 1;
 			break;
-		curr_x += random.randint(-1,1);
-		curr_y += random.randint(-1,1);
-write_to_file("test.png");
+		curr_loc[0] += random.randint(-1,1);
+		curr_loc[1] += random.randint(-1,1);
+
+write_to_image("test.png");
