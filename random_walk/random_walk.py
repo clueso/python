@@ -47,28 +47,32 @@ def check_location_neighbours(x, y):
 def check_within_bounds(x,y):
 	return (x >= 0 and x < rows and y >= 0 and y < cols);
 
-def write_to_image(filename):
-	file_handle = open(filename,'wb');
-	png_writer = png.Writer(rows,cols,greyscale=True);
-	png_writer.write(file_handle,canvas);
-	file_handle.close();
+def write_to_image(filename, save_as_image):
+	if (save_as_image == true):
+		file_handle = open(filename,'wb');
+		png_writer = png.Writer(rows,cols,greyscale=True);
+		png_writer.write(file_handle,canvas);
+		file_handle.close();
 
 def get_start_point():
-	choose_side = random.random();
-	one_side = random.random();
-	if (choose_side < 0.5):
-		if(one_side < 0.5):
-			choose_col = 0;
+	for i in range(0,10):
+		choose_side = random.random();
+		one_side = random.random();
+		if (choose_side < 0.5):
+			if(one_side < 0.5):
+				choose_col = 0;
+			else:
+				choose_col = cols - 1;
+			choose_row = random.randint(0,rows-1);
 		else:
-			choose_col = cols - 1;
-		choose_row = random.randint(0,rows);
-	else:
-		if(one_side < 0.5):
-			choose_row = 0;
-		else:
-			choose_row = rows - 1;
-		choose_col = random.randint(0,cols);
-	return [choose_row, choose_col];
+			if(one_side < 0.5):
+				choose_row = 0;
+			else:
+				choose_row = rows - 1;
+			choose_col = random.randint(0,cols-1);
+		if (canvas[choose_row][choose_col] != 255):
+			return [choose_row, choose_col];
+	return [-1, -1];
 
 particles_completed = 0;
 
@@ -78,6 +82,9 @@ set_canvas_location(120,160,occupied_value);
 
 while (particles_completed < total_particles):
 	curr_loc = get_start_point();
+	if (curr_loc[0] == -1 and curr_loc[1] == -1):
+		print ("Could not get starting point");
+		break;
 	#print("Trying point x=%d, y=%d\n" % (curr_loc[0],curr_loc[1]));	
 	while (check_within_bounds(curr_loc[0],curr_loc[1])):
 		if (check_location_neighbours(curr_loc[0],curr_loc[1])):
@@ -88,4 +95,4 @@ while (particles_completed < total_particles):
 		curr_loc[0] += random.randint(-1,1);
 		curr_loc[1] += random.randint(-1,1);
 
-write_to_image("test.png");
+write_to_image("test.png", true);
